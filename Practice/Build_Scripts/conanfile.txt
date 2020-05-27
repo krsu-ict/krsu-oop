@@ -1,0 +1,17 @@
+[requires]
+qt/5.14.2@bincrafters/stable
+
+[imports]
+bin, *.dll -> ./bin
+lib, *.dylib* -> ./lib
+lib, *.so* -> ./lib
+
+[options]
+qt:with_sqlite3=False
+qt:with_mysql=False
+qt:with_pq=False
+qt:with_odbc=False
+
+[generators]
+cmake
+qt
