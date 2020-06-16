@@ -9,7 +9,8 @@ namespace aur
     {
     public:
         Sphere(const glm::vec3 &center, float radius)
-            : _center(center), _radius(radius) { }
+            : _center(center), _radius(radius)
+        {}
 
         [[nodiscard]] const glm::vec3 &get_center() const
         {

@@ -9,12 +9,13 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <vector>
 
 namespace aur::file_utilities
 {
     typedef std::tuple<std::vector<uint8_t>, unsigned int, unsigned int, unsigned int> image_data_type;
 
-    std::string read_text_file(const std::string &path)
+    static std::string read_text_file(const std::string &path)
     {
         std::ifstream file_stream{path};
         if (!file_stream.is_open()) {
@@ -28,7 +29,7 @@ namespace aur::file_utilities
         return string_stream.str();
     }
 
-    image_data_type read_image_file(const std::string &path)
+    static image_data_type read_image_file(const std::string &path)
     {
         SDL_Surface *surface = IMG_Load(path.c_str());
         if (!surface) {
@@ -44,17 +45,14 @@ namespace aur::file_utilities
         }
 
         auto *data = static_cast<uint8_t *>(surface->pixels);
-        std::vector<uint8_t> image_data;
-        for (int y = surface->h - 1; y >= 0; --y) { // flip the image for the OpenGL coordinate system
-            for (int x = 0; x < surface->w; ++x) {
-                for (int i = 0; i < bytes_per_pixel; ++i) {
-                    image_data.push_back(*(data + y * surface->pitch + x * bytes_per_pixel + i));
-                }
-            }
-        }
+        int image_pitch = surface->pitch;
+        int image_width = surface->w;
+        int image_height = surface->h;
+        std::vector<uint8_t> image_data{data, data + image_height * image_pitch};
+
         SDL_FreeSurface(surface);
 
-        return std::make_tuple(image_data, surface->w, surface->h, bytes_per_pixel);
+        return std::make_tuple(image_data, image_width, image_height, bytes_per_pixel);
     }
 }
 

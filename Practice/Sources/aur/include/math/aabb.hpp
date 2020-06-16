@@ -1,7 +1,9 @@
-#ifndef SPHERE_HPP
-#define SPHERE_HPP
+#ifndef AABB_HPP
+#define AABB_HPP
 
 #include <glm/glm.hpp>
+
+#include <cmath>
 
 namespace aur
 {
@@ -9,7 +11,8 @@ namespace aur
     {
     public:
         AABB(const glm::vec3 &minimum, const glm::vec3 &maximum)
-            : _minimum(minimum), _maximum(maximum) { }
+            : _minimum(minimum), _maximum(maximum)
+        {}
 
         [[nodiscard]] const glm::vec3 &get_minimum() const
         {

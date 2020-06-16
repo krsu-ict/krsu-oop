@@ -13,7 +13,7 @@ namespace aur::geometry_generators
 {
     typedef std::pair<std::vector<unsigned int>, std::vector<Vertex>> geometry_data_type;
 
-    geometry_data_type generate_triangle_geometry_data(float size = 1.0f)
+    static geometry_data_type generate_triangle_geometry_data(float size = 1.0f)
     {
         std::vector<unsigned int> indices;
         std::vector<Vertex> vertices;
@@ -40,11 +40,11 @@ namespace aur::geometry_generators
         return std::make_pair(indices, vertices);
     }
 
-    geometry_data_type generate_circle_geometry_data(float radius, unsigned int segment_count)
+    static geometry_data_type generate_circle_geometry_data(float radius, unsigned int segment_count)
     {
         std::vector<unsigned int> indices;
         std::vector<Vertex> vertices;
-        for (int i = 0; i < segment_count; ++i) {
+        for (unsigned int i = 0; i < segment_count; ++i) {
             float angle{static_cast<float>(i) / static_cast<float>(segment_count) * 2.0f * static_cast<float>(M_PI)};
             float x{cosf(angle) * radius};
             float y{sinf(angle) * radius};
@@ -59,13 +59,13 @@ namespace aur::geometry_generators
                 glm::vec4{u, v, 0.0f, 1.0f},
                 glm::vec4{u, v, 0.0f, 1.0f}
             });
-            indices.push_back(static_cast<unsigned int>(i));
+            indices.push_back(i);
         }
 
         return std::make_pair(indices, vertices);
     }
 
-    geometry_data_type generate_plane_geometry_data(float width, float height, unsigned int width_segments_count, unsigned int height_segments_count)
+    static geometry_data_type generate_plane_geometry_data(float width, float height, unsigned int width_segments_count, unsigned int height_segments_count)
     {
         std::vector<unsigned int> indices;
         std::vector<Vertex> vertices;
@@ -76,10 +76,9 @@ namespace aur::geometry_generators
         float half_width{width * 0.5f};
         float segment_width{width / static_cast<float>(width_segments_count)};
 
-        glm::vec3 normal{0.0f, 0.0f, 1.0f};
         for (unsigned int i = 0; i <= height_segments_count; ++i) {
             float y{static_cast<float>(i) * segment_height - half_height};
-            float v{static_cast<float>(i) / static_cast<float>(height_segments_count)};
+            float v{1.0f - static_cast<float>(i) / static_cast<float>(height_segments_count)};
 
             for (unsigned int j = 0; j <= width_segments_count; ++j) {
                 float x{static_cast<float>(j) * segment_width - half_width};
@@ -117,8 +116,7 @@ namespace aur::geometry_generators
         return std::make_pair(indices, vertices);
     }
 
-    geometry_data_type
-    generate_sphere_geometry_data(float radius, unsigned int segment_count, unsigned int ring_count)
+    static geometry_data_type generate_sphere_geometry_data(float radius, unsigned int segment_count, unsigned int ring_count)
     {
         std::vector<unsigned int> indices;
         std::vector<Vertex> vertices;

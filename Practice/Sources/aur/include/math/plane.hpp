@@ -9,7 +9,8 @@ namespace aur
     class Plane
     {
     public:
-        Plane(const glm::vec3 &normal, float distance) : _normal(normal), _distance(distance) {}
+        Plane(const glm::vec3 &normal, float distance) : _normal(normal), _distance(distance)
+        {}
 
         [[nodiscard]] const glm::vec3 &get_normal() const
         {

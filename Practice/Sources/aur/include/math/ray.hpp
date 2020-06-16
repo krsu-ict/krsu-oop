@@ -16,7 +16,8 @@ namespace aur
         typedef std::pair<bool, float> intersection_test_result_type;
 
     public:
-        Ray(const glm::vec3 &origin, const glm::vec3 &direction) : _origin(origin), _direction(direction) { }
+        Ray(const glm::vec3 &origin, const glm::vec3 &direction) : _origin(origin), _direction(direction)
+        {}
 
         [[nodiscard]] const glm::vec3 &get_origin() const
         {

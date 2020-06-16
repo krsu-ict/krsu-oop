@@ -19,9 +19,9 @@ namespace aur
     public:
         explicit Object(
             std::string name = "",
-            const glm::vec3 &position = glm::vec4(0.0f),
-            const glm::vec3 &rotation = glm::vec4(0.0f),
-            const glm::vec3 &scale = glm::vec4(1.0f),
+            const glm::vec3 &position = glm::vec3(0.0f),
+            const glm::vec3 &rotation = glm::vec3(0.0f),
+            const glm::vec3 &scale = glm::vec3(1.0f),
             std::weak_ptr<Object> parent = {})
             : _name{std::move(name)},
               _position{position}, _rotation{rotation}, _scale{scale},
@@ -69,7 +69,7 @@ namespace aur
 
         void remove_child(std::vector<std::shared_ptr<Object>>::size_type position)
         {
-            _children.erase(_children.begin() + position);
+            _children.erase(_children.begin() + static_cast<std::vector<std::shared_ptr<Object>>::difference_type>(position));
         }
 
         const std::vector<std::shared_ptr<Object>> &get_children() const
@@ -606,10 +606,10 @@ namespace aur
             float s3 = sinf(_rotation.z * 0.5f);
 
             _quaternion_rotation = glm::quat{
-                c1 * c2 * c3 - s1 * s2 * s3,
-                s1 * c2 * c3 + c1 * s2 * s3,
-                c1 * s2 * c3 - s1 * c2 * s3,
-                c1 * c2 * s3 + s1 * s2 * c3,
+                c1 * c2 * c3 + s1 * s2 * s3,
+                s1 * c2 * c3 - c1 * s2 * s3,
+                c1 * s2 * c3 + s1 * c2 * s3,
+                c1 * c2 * s3 - s1 * s2 * c3
             };
             _world_quaternion_rotation = _quaternion_rotation;
         }

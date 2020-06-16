@@ -11,7 +11,7 @@
 
 namespace aur
 {
-    class ES2Geometry : public Geometry
+    class ES2Geometry final : public Geometry
     {
     public:
         explicit ES2Geometry(std::vector<unsigned int> &indices, const std::vector<Vertex> &vertices)
@@ -58,7 +58,7 @@ namespace aur
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_object);
                 glBufferData(
                     GL_ELEMENT_ARRAY_BUFFER,
-                    index_data_size, index_data,
+                    static_cast<GLsizeiptr>(index_data_size), index_data,
                     _convert_usage_strategy_to_es2_buffer_usage_strategy(_indices_usage_strategy)
                 );
                 _index_buffer_object = index_buffer_object;
@@ -77,7 +77,7 @@ namespace aur
                 glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
                 glBufferData(
                     GL_ARRAY_BUFFER,
-                    vertex_data_size, vertex_data,
+                    static_cast<GLsizeiptr>(vertex_data_size), vertex_data,
                     _convert_usage_strategy_to_es2_buffer_usage_strategy(_vertices_usage_strategy)
                 );
                 _vertex_buffer_object = vertex_buffer_object;
@@ -109,63 +109,63 @@ namespace aur
 
                 int position_attribute_location{attributes.count("position") > 0 ? attributes.at("position") : -1};
                 if (position_attribute_location != -1) {
-                    glEnableVertexAttribArray(position_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(position_attribute_location));
                     glVertexAttribPointer(
-                        position_attribute_location,
+                        static_cast<GLuint>(position_attribute_location),
                         3, GL_FLOAT, GL_FALSE, stride, static_cast<const GLvoid *>(nullptr)
                     );
                 }
 
                 int color_attribute_location{attributes.count("color") > 0 ? attributes.at("color") : -1};
                 if (color_attribute_location != -1) {
-                    glEnableVertexAttribArray(color_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(color_attribute_location));
                     glVertexAttribPointer(
-                        color_attribute_location,
+                        static_cast<GLuint>(color_attribute_location),
                         4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 3)
                     );
                 }
 
                 int normal_attribute_location{attributes.count("normal") > 0 ? attributes.at("normal") : -1};
                 if (normal_attribute_location != -1) {
-                    glEnableVertexAttribArray(normal_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(normal_attribute_location));
                     glVertexAttribPointer(
-                        normal_attribute_location,
+                        static_cast<GLuint>(normal_attribute_location),
                         3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 7)
                     );
                 }
 
                 int tangent_attribute_location{attributes.count("tangent") > 0 ? attributes.at("tangent") : -1};
                 if (tangent_attribute_location != -1) {
-                    glEnableVertexAttribArray(tangent_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(tangent_attribute_location));
                     glVertexAttribPointer(
-                        tangent_attribute_location,
+                        static_cast<GLuint>(tangent_attribute_location),
                         4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 10)
                     );
                 }
 
                 int binormal_attribute_location{attributes.count("binormal") > 0 ? attributes.at("binormal") : -1};
                 if (binormal_attribute_location != -1) {
-                    glEnableVertexAttribArray(binormal_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(binormal_attribute_location));
                     glVertexAttribPointer(
-                        binormal_attribute_location,
+                        static_cast<GLuint>(binormal_attribute_location),
                         3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 14)
                     );
                 }
 
                 int texture1_coordinates_attribute_location{attributes.count("texture1_coordinates") > 0 ? attributes.at("texture1_coordinates") : -1};
                 if (texture1_coordinates_attribute_location != -1) {
-                    glEnableVertexAttribArray(texture1_coordinates_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(texture1_coordinates_attribute_location));
                     glVertexAttribPointer(
-                        texture1_coordinates_attribute_location,
+                        static_cast<GLuint>(texture1_coordinates_attribute_location),
                         4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 17)
                     );
                 }
 
                 int texture2_coordinates_attribute_location{attributes.count("texture2_coordinates") > 0 ? attributes.at("texture2_coordinates") : -1};
                 if (texture2_coordinates_attribute_location != -1) {
-                    glEnableVertexAttribArray(texture2_coordinates_attribute_location);
+                    glEnableVertexAttribArray(static_cast<GLuint>(texture2_coordinates_attribute_location));
                     glVertexAttribPointer(
-                        texture2_coordinates_attribute_location,
+                        static_cast<GLuint>(texture2_coordinates_attribute_location),
                         4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 21)
                     );
                 }
@@ -206,9 +206,8 @@ namespace aur
                     return GL_DYNAMIC_DRAW;
                 case StreamStrategy:
                     return GL_STREAM_DRAW;
-                default:
-                    return GL_STATIC_DRAW;
             }
+            return GL_STATIC_DRAW;
         }
     };
 }

@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <cstddef>
 
 namespace aur
 {
@@ -383,7 +384,7 @@ namespace aur
                 int texture1_enabled_uniform_location{_shader->get_uniforms().at("texture1_enabled")};
                 glUniform1i(
                     texture1_enabled_uniform_location,
-                    (GLint) _texture1->is_enabled()
+                    static_cast<GLint>(_texture1->is_enabled())
                 );
 
                 if (_texture1->is_enabled()) {
@@ -393,13 +394,13 @@ namespace aur
                     int texturing_mode1_uniform_location{_shader->get_uniforms().at("texturing_mode1")};
                     glUniform1i(
                         texturing_mode1_uniform_location,
-                        (GLint) _texture1->get_mode()
+                        static_cast<GLint>(_texture1->get_mode())
                     );
 
                     int texture1_transformation_enabled_uniform_location{_shader->get_uniforms().at("texture1_transformation_enabled")};
                     glUniform1i(
                         texture1_transformation_enabled_uniform_location,
-                        (GLint) _texture1->is_transformation_enabled()
+                        static_cast<GLint>(_texture1->is_transformation_enabled())
                     );
 
                     int texture1_transformation_matrix_uniform_location{_shader->get_uniforms().at("texture1_transformation_matrix")};
@@ -417,7 +418,7 @@ namespace aur
                 int texture2_enabled_uniform_location{_shader->get_uniforms().at("texture2_enabled")};
                 glUniform1i(
                     texture2_enabled_uniform_location,
-                    (GLint) _texture2->is_enabled()
+                    static_cast<GLint>(_texture2->is_enabled())
                 );
 
                 if (_texture2->is_enabled()) {
@@ -427,13 +428,13 @@ namespace aur
                     int texturing_mode2_uniform_location{_shader->get_uniforms().at("texturing_mode2")};
                     glUniform1i(
                         texturing_mode2_uniform_location,
-                        (GLint) _texture2->get_mode()
+                        static_cast<GLint>(_texture2->get_mode())
                     );
 
                     int texture2_transformation_enabled_uniform_location{_shader->get_uniforms().at("texture2_transformation_enabled")};
                     glUniform1i(
                         texture2_transformation_enabled_uniform_location,
-                        (GLint) _texture2->is_transformation_enabled()
+                        static_cast<GLint>(_texture2->is_transformation_enabled())
                     );
 
                     int texture2_transformation_matrix_uniform_location{_shader->get_uniforms().at("texture2_transformation_matrix")};
@@ -451,7 +452,7 @@ namespace aur
                 int texture1_normals_enabled_uniform_location{_shader->get_uniforms().at("texture1_normals_enabled")};
                 glUniform1i(
                     texture1_normals_enabled_uniform_location,
-                    (GLint) _texture1_normals->is_enabled()
+                    static_cast<GLint>(_texture1_normals->is_enabled())
                 );
 
                 if (_texture1_normals->is_enabled()) {
@@ -461,13 +462,13 @@ namespace aur
             }
 
             int fog_enabled_uniform_location{_shader->get_uniforms().at("fog_enabled")};
-            glUniform1i(fog_enabled_uniform_location, (GLint) _fog_enabled);
+            glUniform1i(fog_enabled_uniform_location, static_cast<GLint>(_fog_enabled));
 
             int fog_type_uniform_location{_shader->get_uniforms().at("fog_type")};
-            glUniform1i(fog_type_uniform_location, (GLint) _fog_type);
+            glUniform1i(fog_type_uniform_location, static_cast<GLint>(_fog_type));
 
             int fog_depth_uniform_location{_shader->get_uniforms().at("fog_depth")};
-            glUniform1i(fog_depth_uniform_location, (GLint) _fog_depth);
+            glUniform1i(fog_depth_uniform_location, static_cast<GLint>(_fog_depth));
 
             int fog_color_uniform_location{_shader->get_uniforms().at("fog_color")};
             glUniform3fv(
@@ -500,16 +501,16 @@ namespace aur
         }
 
     private:
-        static std::string _uniform_at_index(const std::string &uniform, int slot)
+        static std::string _uniform_at_index(const std::string &uniform, size_t slot)
         {
             return uniform + "[" + std::to_string(slot) + "]";
         }
 
         void _update_light_uniforms_if_necessary(const std::shared_ptr<Scene> &scene)
         {
-            int directional_light_count = scene->get_directional_lights().size();
-            int point_light_count = scene->get_point_lights().size();
-            int spot_light_count = scene->get_spot_lights().size();
+            auto directional_light_count = scene->get_directional_lights().size();
+            auto point_light_count = scene->get_point_lights().size();
+            auto spot_light_count = scene->get_spot_lights().size();
 
             if (_previous_directional_light_count != directional_light_count ||
                 _previous_point_light_count != point_light_count ||
@@ -597,25 +598,25 @@ namespace aur
                     uniform_map[uniform] = -1;
                 }
                 for (const auto &uniform : directional_light_uniforms) {
-                    for (int i = 0; i < directional_light_count; ++i) {
+                    for (size_t i = 0; i < directional_light_count; ++i) {
                         uniform_map[_uniform_at_index(uniform, i)] = -1;
                     }
                 }
                 for (const auto &uniform : point_light_uniforms) {
-                    for (int i = 0; i < point_light_count; ++i) {
+                    for (size_t i = 0; i < point_light_count; ++i) {
                         uniform_map[_uniform_at_index(uniform, i)] = -1;
                     }
                 }
                 for (const auto &uniform : spot_light_uniforms) {
-                    for (int i = 0; i < spot_light_count; ++i) {
+                    for (size_t i = 0; i < spot_light_count; ++i) {
                         uniform_map[_uniform_at_index(uniform, i)] = -1;
                     }
                 }
 
                 _shader->set_fragment_shader_source(
                     "#define DIRECTIONAL_LIGHT_COUNT " + std::to_string(directional_light_count) + "\n" +
-                    "#define POINT_LIGHT_COUNT " + std::to_string(point_light_count) + "\n" +
-                    "#define SPOT_LIGHT_COUNT " + std::to_string(spot_light_count) + "\n\n" +
+                    "#define POINT_LIGHT_COUNT "       + std::to_string(point_light_count)       + "\n" +
+                    "#define SPOT_LIGHT_COUNT "        + std::to_string(spot_light_count)        + "\n\n" +
                     _fragment_shader_source
                 );
                 _shader->compile();
@@ -645,9 +646,9 @@ namespace aur
                     return GL_GEQUAL;
                 case Material::DepthTestFunction::NotEqual:
                     return GL_NOTEQUAL;
-                default:
-                    return GL_LESS;
             }
+
+            return GL_LESS;
         }
 
         static GLenum _convert_blending_equation_to_es2_blending_equation(Material::BlendingEquation blending_equation)
@@ -659,9 +660,9 @@ namespace aur
                     return GL_FUNC_SUBTRACT;
                 case Material::BlendingEquation::ReverseSubtraction:
                     return GL_FUNC_REVERSE_SUBTRACT;
-                default:
-                    return GL_FUNC_ADD;
             }
+
+            return GL_FUNC_ADD;
         }
 
         static GLenum _convert_blending_func_to_es2_blending_func(Material::BlendingFunction blending_function)
@@ -697,9 +698,9 @@ namespace aur
                     return GL_ONE_MINUS_CONSTANT_ALPHA;
                 case SourceAlphaSaturate:
                     return GL_SRC_ALPHA_SATURATE;
-                default:
-                    return GL_SRC_ALPHA;
             }
+
+            return GL_SRC_ALPHA;
         }
 
         static GLenum _convert_cull_face_mode_to_es2_cull_face_mode(Material::CullFaceMode cull_face_mode)
@@ -711,9 +712,9 @@ namespace aur
                     return GL_BACK;
                 case Material::CullFaceMode::CullFrontAndBackFaces:
                     return GL_FRONT_AND_BACK;
-                default:
-                    return GL_BACK;
             }
+
+            return GL_BACK;
         }
 
         static GLenum _convert_front_face_order_to_es2_front_face_order(Material::FrontFaceOrder front_face_order)
@@ -723,17 +724,17 @@ namespace aur
                     return GL_CW;
                 case Material::FrontFaceOrder::Counterclockwise:
                     return GL_CCW;
-                default:
-                    return GL_CW;
             }
+
+            return GL_CW;
         }
 
         std::string _vertex_shader_source;
         std::string _fragment_shader_source;
 
-        int _previous_directional_light_count{1};
-        int _previous_point_light_count{1};
-        int _previous_spot_light_count{0};
+        size_t _previous_directional_light_count{1};
+        size_t _previous_point_light_count{1};
+        size_t _previous_spot_light_count{0};
     };
 }
 

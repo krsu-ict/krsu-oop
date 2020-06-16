@@ -14,7 +14,7 @@
 
 namespace aur
 {
-    class ES2Renderer : public Renderer
+    class ES2Renderer final : public Renderer
     {
     public:
         ES2Renderer(const std::shared_ptr<Scene> &scene, const std::shared_ptr<Window> &window)
@@ -131,9 +131,9 @@ namespace aur
                     return GL_TRIANGLE_FAN;
                 case Geometry::Type::TriangleStrip:
                     return GL_TRIANGLE_STRIP;
-                default:
-                    return GL_TRIANGLES;
             }
+
+            return GL_TRIANGLES;
         }
     };
 }

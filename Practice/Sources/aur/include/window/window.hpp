@@ -10,6 +10,8 @@ namespace aur
     class Window
     {
     public:
+        inline static const unsigned int FULLSCREEN = 0;
+
         Window(std::string name, unsigned int width, unsigned int height) :
             _name{std::move(name)},
             _width{width}, _height{height}

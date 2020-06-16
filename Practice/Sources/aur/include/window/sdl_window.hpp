@@ -19,6 +19,12 @@ namespace aur
     class SDLWindow final : public Window
     {
     public:
+        explicit SDLWindow(
+            const std::string &name,
+            bool msaa_enabled = false,
+            int msaa_samples = 2
+        ) : SDLWindow(name, FULLSCREEN, FULLSCREEN, msaa_enabled, msaa_samples) {}
+
         SDLWindow(
             const std::string &name,
             unsigned int width, unsigned int height,
@@ -26,6 +32,12 @@ namespace aur
             int msaa_samples = 2
         ) : Window{name, width, height}
         {
+            if (_instance != nullptr) {
+                std::cerr << "Only one SDL window is supported at this moment." << std::endl;
+                exit(-1);
+            }
+            _instance = this;
+
             if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0) {
                 std::cerr << "Failed to create an SDL window." << std::endl;
                 exit(-1);
@@ -49,9 +61,9 @@ namespace aur
                 SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, msaa_samples);
             }
 
-            unsigned int flags{static_cast<unsigned int>(SDL_WINDOW_OPENGL) | static_cast<unsigned int>(SDL_WINDOW_ALLOW_HIGHDPI)};
-            if (width <= 0 || height <= 0) {
-                flags |= static_cast<unsigned int>(SDL_WINDOW_FULLSCREEN_DESKTOP);
+            unsigned int flags{SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI};
+            if (width == FULLSCREEN || height <= FULLSCREEN) {
+                flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
             }
             _window = SDL_CreateWindow(
                 name.c_str(),
@@ -170,6 +182,8 @@ namespace aur
         }
 
     private:
+        inline static SDLWindow *_instance = nullptr;
+
         ImGuiIO *_io;
         SDL_GLContext _gl_context;
         SDL_Window *_window;

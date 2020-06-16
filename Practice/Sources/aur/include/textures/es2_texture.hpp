@@ -33,21 +33,23 @@ namespace aur
                     glGenTextures(1, &_texture);
                     glBindTexture(GL_TEXTURE_2D, _texture);
                     GLint format = _channels == 3 ? GL_RGB : GL_RGBA;
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
                     glTexImage2D(
                         GL_TEXTURE_2D, 0, format,
                         static_cast<GLsizei>(_width),
                         static_cast<GLsizei>(_height),
-                        0, format, GL_UNSIGNED_BYTE,
+                        0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
                         reinterpret_cast<GLvoid *>(_image_data.data())
                     );
                 } else {
                     glBindTexture(GL_TEXTURE_2D, _texture);
                     GLint format = _channels == 3 ? GL_RGB : GL_RGBA;
+                    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
                     glTexSubImage2D(
                         GL_TEXTURE_2D, 0, 0, 0,
                         static_cast<GLsizei>(_width),
                         static_cast<GLsizei>(_height),
-                        format, GL_UNSIGNED_BYTE,
+                        static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
                         reinterpret_cast<GLvoid *>(_image_data.data())
                     );
                 }
@@ -80,7 +82,7 @@ namespace aur
                     _convert_filter_type_to_es2_texture_filter_type(_minification_filter)
                 );
                 glTexParameterf(
-                    GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (GLfloat) _anisotropy
+                    GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, static_cast<GLfloat>(_anisotropy)
                 );
 
                 glBindTexture(GL_TEXTURE_2D, 0);
@@ -100,7 +102,7 @@ namespace aur
     private:
         GLuint _texture{0};
 
-        static GLenum _convert_wrap_mode_to_es2_texture_wrap_mode(Texture::WrapMode wrap_mode)
+        static GLint _convert_wrap_mode_to_es2_texture_wrap_mode(Texture::WrapMode wrap_mode)
         {
             switch (wrap_mode) {
                 case Repeat:
@@ -109,12 +111,12 @@ namespace aur
                     return GL_MIRRORED_REPEAT;
                 case ClampToEdge:
                     return GL_CLAMP_TO_EDGE;
-                default:
-                    return GL_REPEAT;
             }
+
+            return GL_REPEAT;
         }
 
-        static GLenum _convert_filter_type_to_es2_texture_filter_type(Texture::FilterType filter)
+        static GLint _convert_filter_type_to_es2_texture_filter_type(Texture::FilterType filter)
         {
             switch (filter) {
                 case Nearest:
@@ -129,9 +131,9 @@ namespace aur
                     return GL_LINEAR_MIPMAP_NEAREST;
                 case LinearMipmapLinear:
                     return GL_LINEAR_MIPMAP_LINEAR;
-                default:
-                    return GL_NEAREST;
             }
+
+            return GL_NEAREST;
         }
     };
 }

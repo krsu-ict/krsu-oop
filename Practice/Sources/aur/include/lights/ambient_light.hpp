@@ -9,7 +9,8 @@ namespace aur
     {
     public:
         explicit AmbientLight(const glm::vec3 &ambient_color = {0.07f, 0.07f, 0.07f})
-            : _ambient_color(ambient_color) {}
+            : _ambient_color(ambient_color)
+        {}
 
         [[nodiscard]] const glm::vec3 &get_ambient_color() const
         {

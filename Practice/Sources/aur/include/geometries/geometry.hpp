@@ -113,9 +113,9 @@ namespace aur
                 vertex.binormal = glm::vec3(0.0f);
             }
 
-            int index = _type == TriangleFan ? 1 : 0;
+            std::vector<unsigned int>::size_type index = _type == TriangleFan ? 1 : 0;
             while (index < _indices.size()) {
-                int a_index, b_index, c_index;
+                std::vector<unsigned int>::size_type a_index, b_index, c_index;
                 switch (_type) {
                     case Triangles:
                         a_index = index;
@@ -143,12 +143,12 @@ namespace aur
                 Vertex &b = _vertices[_indices[b_index]];
                 Vertex &c = _vertices[_indices[c_index]];
 
-                glm::vec3 q1 = b.position - a.position;
-                glm::vec3 q2 = c.position - a.position;
-
                 glm::vec4 a_texture_coordinates = a.texture1_coordinates;
                 glm::vec4 b_texture_coordinates = b.texture1_coordinates;
                 glm::vec4 c_texture_coordinates = c.texture1_coordinates;
+
+                glm::vec3 q1 = b.position - a.position;
+                glm::vec3 q2 = c.position - a.position;
 
                 float s1 = b_texture_coordinates.s - a_texture_coordinates.s;
                 float s2 = c_texture_coordinates.s - a_texture_coordinates.s;
@@ -156,7 +156,7 @@ namespace aur
                 float t2 = c_texture_coordinates.t - a_texture_coordinates.t;
 
                 glm::vec3 tangent = glm::normalize((q1 * t2) - (q2 * t1));
-                glm::vec3 binormal = glm::normalize((q1 * -s2) + (q2 * s1));
+                glm::vec3 binormal = glm::normalize((q2 * s1) - (q1 * s2));
 
                 a.tangent += glm::vec4(tangent, 0.0f);
                 b.tangent += glm::vec4(tangent, 0.0f);
@@ -170,14 +170,16 @@ namespace aur
             for (auto &vertex : _vertices) {
                 glm::vec3 normal = vertex.normal;
                 glm::vec3 tangent = vertex.tangent;
+                glm::vec3 binormal = vertex.binormal;
 
                 tangent = glm::normalize(tangent - (normal * glm::dot(tangent, normal)));
                 glm::vec4 tangent_with_determinant = glm::vec4(tangent, 0.0f);
 
-                bool mirrored = glm::dot(glm::cross(normal, tangent), vertex.binormal) < 0.0f;
-                tangent_with_determinant[3] = mirrored ? -1.0f : 1.0f;
+                bool mirrored = glm::dot(glm::cross(normal, tangent), binormal) < 0.0f;
+                tangent_with_determinant[3] = mirrored ? 1.0f : -1.0f;
 
                 vertex.tangent = tangent_with_determinant;
+                vertex.binormal = glm::cross(normal, tangent) * tangent_with_determinant[3];
             }
         }
 

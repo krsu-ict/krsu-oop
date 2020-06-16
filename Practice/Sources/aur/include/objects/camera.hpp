@@ -12,7 +12,8 @@ namespace aur
     class Camera : public Object
     {
     public:
-        Camera() : Object{"camera"} {
+        Camera() : Object{"camera"}
+        {
             _update_camera_sides();
         }
 

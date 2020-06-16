@@ -25,7 +25,7 @@ namespace aur
         ~ES2Shader() final
         {
             if (_program != -1) {
-                glDeleteProgram(_program);
+                glDeleteProgram(static_cast<GLuint>(_program));
             }
         }
 
@@ -45,7 +45,7 @@ namespace aur
                 return;
             }
 
-            int shader_program = _link_shader(vertex_shader_object, fragment_shader_object);
+            int shader_program = _link_shader(static_cast<GLuint>(vertex_shader_object), static_cast<GLuint>(fragment_shader_object));
             if (shader_program == -1) {
                 _dead = true;
                 return;
@@ -57,7 +57,7 @@ namespace aur
         void cleanup() final
         {
             if (_program != -1) {
-                glDeleteProgram(_program);
+                glDeleteProgram(static_cast<GLuint>(_program));
             }
             _program = -1;
             _dead = false;
@@ -66,12 +66,12 @@ namespace aur
         void use() final
         {
             if (_program != -1) {
-                glUseProgram(_program);
+                glUseProgram(static_cast<GLuint>(_program));
             }
         }
 
     private:
-        int _compile_shader(int shader_type)
+        int _compile_shader(GLenum shader_type)
         {
             const char *shader_source =
                 shader_type == GL_VERTEX_SHADER ?
@@ -79,7 +79,7 @@ namespace aur
                     _fragment_shader_source.c_str();
 
             GLuint shader_object = glCreateShader(shader_type);
-            glShaderSource(shader_object, 1, (const GLchar **) &shader_source, nullptr);
+            glShaderSource(shader_object, 1, static_cast<const GLchar **>(&shader_source), nullptr);
             glCompileShader(shader_object);
 
             GLint status;
@@ -88,7 +88,7 @@ namespace aur
                 GLint info_log_length;
                 glGetShaderiv(shader_object, GL_INFO_LOG_LENGTH, &info_log_length);
                 if (info_log_length > 0) {
-                    auto *info_log = new GLchar[info_log_length];
+                    auto *info_log = new GLchar[static_cast<size_t>(info_log_length)];
 
                     glGetShaderInfoLog(shader_object, info_log_length, nullptr, info_log);
                     std::cerr << "Failed to compile a vertex shader" << std::endl
@@ -99,10 +99,10 @@ namespace aur
                 return _program = -1;
             }
 
-            return shader_object;
+            return static_cast<int>(shader_object);
         }
 
-        int _link_shader(int vertex_shader_object, int fragment_shader_object)
+        int _link_shader(GLuint vertex_shader_object, GLuint fragment_shader_object)
         {
             GLuint shader_program = glCreateProgram();
             glAttachShader(shader_program, vertex_shader_object);
@@ -115,7 +115,7 @@ namespace aur
                 GLint info_log_length;
                 glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &info_log_length);
                 if (info_log_length > 0) {
-                    auto *info_log = new GLchar[info_log_length];
+                    auto *info_log = new GLchar[static_cast<size_t>(info_log_length)];
 
                     glGetProgramInfoLog(shader_program, info_log_length, nullptr, info_log);
                     std::cerr << "Failed to link a shader program" << std::endl
@@ -138,7 +138,7 @@ namespace aur
                 _uniforms[uniform.first] = glGetUniformLocation(shader_program, uniform.first.c_str());
             }
 
-            return shader_program;
+            return static_cast<int>(shader_program);
         }
     };
 }
