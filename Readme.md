@@ -43,10 +43,18 @@
 
 * <https://docs.google.com/spreadsheets/d/1e7lIAb2She5vjsbVF_yscAycezQ8YgUIfNKz2aEqcLc>
 
-## Регистрация на экзамен
+## Регистрация на промежуточный экзамен
 
 * <https://docs.google.com/spreadsheets/d/1pK22TNUxjbuI3VOWYoDkyAeCHBFOjX5BPV7ls4UhTpk>
 
-## Индивидуальный список заданий для сдачи
+## Индивидуальный список заданий для сдачи на промежуточный экзамен
 
 * <https://docs.google.com/spreadsheets/d/1S75_KAFviam7yBu6RwkMGoFb3ajjsu6Wx22nCabftEU>
+
+## Регистрация на финальный
+
+* <https://docs.google.com/spreadsheets/d/1dNaRYLQwGIapxCsCWRwu-H5G7HBmKGFymq6Cz0Spvdw>
+
+## Индивидуальный список заданий для сдачи на финальный экзамен
+
+* <https://docs.google.com/spreadsheets/d/16kQTAcuww49_2WLj-pNCf9JxFZNt9nOm-kFnPrT1Kzc>
