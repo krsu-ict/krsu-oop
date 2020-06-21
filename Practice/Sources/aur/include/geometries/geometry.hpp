@@ -53,9 +53,41 @@ namespace aur
             return _indices;
         }
 
+        [[nodiscard]] std::vector<unsigned int> &get_indices()
+        {
+            return _indices;
+        }
+
+        void set_indices(const std::vector<unsigned int> &indices)
+        {
+            _indices = indices;
+            _requires_indices_update = true;
+        }
+
         [[nodiscard]] const std::vector<Vertex> &get_vertices() const
         {
             return _vertices;
+        }
+
+        [[nodiscard]] std::vector<Vertex> &get_vertices()
+        {
+            return _vertices;
+        }
+
+        void set_vertices(const std::vector<Vertex> &vertices)
+        {
+            _vertices = vertices;
+            _requires_vertices_update = true;
+        }
+
+        void set_requires_indices_update(bool requires_indices_update)
+        {
+            _requires_indices_update = requires_indices_update;
+        }
+
+        void set_requires_vertices_update(bool requires_vertices_update)
+        {
+            _requires_vertices_update = requires_vertices_update;
         }
 
         [[nodiscard]] UsageStrategy get_vertices_usage_strategy() const
@@ -181,6 +213,8 @@ namespace aur
                 vertex.tangent = tangent_with_determinant;
                 vertex.binormal = glm::cross(normal, tangent) * tangent_with_determinant[3];
             }
+
+            _requires_vertices_update = true;
         }
 
         virtual void update(const Material &material) = 0;
@@ -191,8 +225,8 @@ namespace aur
         Type _type{Triangles};
 
         std::vector<unsigned int> _indices;
-        std::vector<Vertex> _vertices;
         bool _requires_indices_update{true};
+        std::vector<Vertex> _vertices;
         bool _requires_vertices_update{true};
 
         UsageStrategy _vertices_usage_strategy{StaticStrategy};

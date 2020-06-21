@@ -43,6 +43,23 @@ namespace aur
             _name = name;
         }
 
+        bool is_enabled() const
+        {
+            return _enabled;
+        }
+
+        void set_enabled(bool enabled)
+        {
+            if (_enabled != enabled) {
+                _enabled = enabled;
+                _enabled_specified = enabled;
+
+                for (auto &child : _children) {
+                    child->_set_enabled(_enabled);
+                }
+            }
+        }
+
         const std::weak_ptr<Object> &get_parent() const
         {
             return _parent;
@@ -70,6 +87,11 @@ namespace aur
         void remove_child(std::vector<std::shared_ptr<Object>>::size_type position)
         {
             _children.erase(_children.begin() + static_cast<std::vector<std::shared_ptr<Object>>::difference_type>(position));
+        }
+
+        void remove_children()
+        {
+            _children.clear();
         }
 
         const std::vector<std::shared_ptr<Object>> &get_children() const
@@ -492,6 +514,8 @@ namespace aur
 
     protected:
         std::string _name;
+        bool _enabled{true};
+        bool _enabled_specified{true};
 
         glm::vec3 _position;
         glm::vec3 _rotation;
@@ -512,6 +536,19 @@ namespace aur
         glm::mat4 _model_matrix{1.0f};
         bool _world_matrix_requires_update{true};
         glm::mat4 _world_matrix{1.0f};
+
+        void _set_enabled(bool enabled)
+        {
+            if (enabled) {
+                _enabled = _enabled_specified;
+            } else {
+                _enabled = enabled;
+            }
+
+            for (auto &child : _children) {
+                child->_set_enabled(_enabled);
+            }
+        }
 
         void _update_model_matrix_if_necessary()
         {

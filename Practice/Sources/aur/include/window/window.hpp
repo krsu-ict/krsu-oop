@@ -29,6 +29,11 @@ namespace aur
             return _height;
         }
 
+        [[nodiscard]] float get_aspect_ratio() const
+        {
+            return static_cast<float>(_width) / static_cast<float>(_height);
+        }
+
         [[nodiscard]] const std::function<void()> &get_on_exit() const
         {
             return _on_exit;

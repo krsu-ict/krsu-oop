@@ -7,6 +7,7 @@ glm/0.9.9.5@g-truc/stable
 imgui/1.75
 
 [options]
+sdl2:iconv=False
 sdl2_image:gif=False
 sdl2_image:lbm=False
 sdl2_image:pcx=False

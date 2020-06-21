@@ -18,7 +18,7 @@ namespace aur
             : Geometry(indices, vertices) {}
 
         ES2Geometry(const ES2Geometry &other) = delete;
-        ES2Geometry& operator=(const ES2Geometry & other) = delete;
+        ES2Geometry& operator=(const ES2Geometry &other) = delete;
 
         ~ES2Geometry() final
         {
@@ -45,6 +45,22 @@ namespace aur
                 return;
             }
 
+#ifdef __APPLE__
+            glBindVertexArrayAPPLE(0);
+#else
+            glBindVertexArray(0);
+#endif
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            if (_vertex_array_object != 0) {
+#ifdef __APPLE__
+                glDeleteVertexArraysAPPLE(1, &_vertex_array_object);
+#else
+                glDeleteVertexArrays(1, &_vertex_array_object);
+#endif
+            }
+
             if (_requires_indices_update) {
                 if (_index_buffer_object != 0) {
                     glDeleteBuffers(1, &_index_buffer_object);
@@ -62,6 +78,8 @@ namespace aur
                     _convert_usage_strategy_to_es2_buffer_usage_strategy(_indices_usage_strategy)
                 );
                 _index_buffer_object = index_buffer_object;
+
+                _requires_indices_update = false;
             }
 
             if (_requires_vertices_update) {
@@ -81,104 +99,96 @@ namespace aur
                     _convert_usage_strategy_to_es2_buffer_usage_strategy(_vertices_usage_strategy)
                 );
                 _vertex_buffer_object = vertex_buffer_object;
+
+                _requires_vertices_update = false;
             }
 
-            if (_requires_indices_update || _requires_vertices_update) {
-                if (_vertex_array_object != 0) {
+            GLuint vertex_array_object{0};
 #ifdef __APPLE__
-                    glDeleteVertexArraysAPPLE(1, &_vertex_array_object);
+            glGenVertexArraysAPPLE(1, &vertex_array_object);
+            glBindVertexArrayAPPLE(vertex_array_object);
 #else
-                    glDeleteVertexArrays(1, &_vertex_array_object);
+            glGenVertexArrays(1, &vertex_array_object);
+            glBindVertexArray(vertex_array_object);
 #endif
-                }
+            glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer_object);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer_object);
 
-                GLuint vertex_array_object{0};
-#ifdef __APPLE__
-                glGenVertexArraysAPPLE(1, &vertex_array_object);
-                glBindVertexArrayAPPLE(vertex_array_object);
-#else
-                glGenVertexArrays(1, &vertex_array_object);
-                glBindVertexArray(vertex_array_object);
-#endif
-                glBindBuffer(GL_ARRAY_BUFFER, _vertex_buffer_object);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_buffer_object);
+            auto &attributes = material.get_shader()->get_attributes();
 
-                auto &attributes = material.get_shader()->get_attributes();
+            GLsizei stride = sizeof(GLfloat) * 25;
 
-                GLsizei stride = sizeof(GLfloat) * 25;
-
-                int position_attribute_location{attributes.count("position") > 0 ? attributes.at("position") : -1};
-                if (position_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(position_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(position_attribute_location),
-                        3, GL_FLOAT, GL_FALSE, stride, static_cast<const GLvoid *>(nullptr)
-                    );
-                }
-
-                int color_attribute_location{attributes.count("color") > 0 ? attributes.at("color") : -1};
-                if (color_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(color_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(color_attribute_location),
-                        4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 3)
-                    );
-                }
-
-                int normal_attribute_location{attributes.count("normal") > 0 ? attributes.at("normal") : -1};
-                if (normal_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(normal_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(normal_attribute_location),
-                        3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 7)
-                    );
-                }
-
-                int tangent_attribute_location{attributes.count("tangent") > 0 ? attributes.at("tangent") : -1};
-                if (tangent_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(tangent_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(tangent_attribute_location),
-                        4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 10)
-                    );
-                }
-
-                int binormal_attribute_location{attributes.count("binormal") > 0 ? attributes.at("binormal") : -1};
-                if (binormal_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(binormal_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(binormal_attribute_location),
-                        3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 14)
-                    );
-                }
-
-                int texture1_coordinates_attribute_location{attributes.count("texture1_coordinates") > 0 ? attributes.at("texture1_coordinates") : -1};
-                if (texture1_coordinates_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(texture1_coordinates_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(texture1_coordinates_attribute_location),
-                        4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 17)
-                    );
-                }
-
-                int texture2_coordinates_attribute_location{attributes.count("texture2_coordinates") > 0 ? attributes.at("texture2_coordinates") : -1};
-                if (texture2_coordinates_attribute_location != -1) {
-                    glEnableVertexAttribArray(static_cast<GLuint>(texture2_coordinates_attribute_location));
-                    glVertexAttribPointer(
-                        static_cast<GLuint>(texture2_coordinates_attribute_location),
-                        4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 21)
-                    );
-                }
-#ifdef __APPLE__
-                glBindVertexArrayAPPLE(0);
-#else
-                glBindVertexArray(0);
-#endif
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-                _vertex_array_object = vertex_array_object;
+            int position_attribute_location{attributes.count("position") > 0 ? attributes.at("position") : -1};
+            if (position_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(position_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(position_attribute_location),
+                    3, GL_FLOAT, GL_FALSE, stride, static_cast<const GLvoid *>(nullptr)
+                );
             }
+
+            int color_attribute_location{attributes.count("color") > 0 ? attributes.at("color") : -1};
+            if (color_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(color_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(color_attribute_location),
+                    4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 3)
+                );
+            }
+
+            int normal_attribute_location{attributes.count("normal") > 0 ? attributes.at("normal") : -1};
+            if (normal_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(normal_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(normal_attribute_location),
+                    3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 7)
+                );
+            }
+
+            int tangent_attribute_location{attributes.count("tangent") > 0 ? attributes.at("tangent") : -1};
+            if (tangent_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(tangent_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(tangent_attribute_location),
+                    4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 10)
+                );
+            }
+
+            int binormal_attribute_location{attributes.count("binormal") > 0 ? attributes.at("binormal") : -1};
+            if (binormal_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(binormal_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(binormal_attribute_location),
+                    3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 14)
+                );
+            }
+
+            int texture1_coordinates_attribute_location{attributes.count("texture1_coordinates") > 0 ? attributes.at("texture1_coordinates") : -1};
+            if (texture1_coordinates_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(texture1_coordinates_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(texture1_coordinates_attribute_location),
+                    4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 17)
+                );
+            }
+
+            int texture2_coordinates_attribute_location{attributes.count("texture2_coordinates") > 0 ? attributes.at("texture2_coordinates") : -1};
+            if (texture2_coordinates_attribute_location != -1) {
+                glEnableVertexAttribArray(static_cast<GLuint>(texture2_coordinates_attribute_location));
+                glVertexAttribPointer(
+                    static_cast<GLuint>(texture2_coordinates_attribute_location),
+                    4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const GLvoid *>(sizeof(GLfloat) * 21)
+                );
+            }
+#ifdef __APPLE__
+            glBindVertexArrayAPPLE(0);
+#else
+            glBindVertexArray(0);
+#endif
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+            _vertex_array_object = vertex_array_object;
         }
 
         void use() final

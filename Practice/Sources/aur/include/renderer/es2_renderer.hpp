@@ -35,7 +35,7 @@ namespace aur
 
                     material->use();
                     material->update(scene, mesh);
-                    geometry->update(*mesh->get_material());
+                    geometry->update(*material);
                 }
 
                 for (const auto &child: object->get_children()) { queue.push(child); }
@@ -44,21 +44,21 @@ namespace aur
 
         void render() final
         {
-            glViewport(0, 0, static_cast<GLsizei>(window->get_width()), static_cast<GLsizei>(window->get_height()));
+            glViewport(0, 0, static_cast<GLsizei>(_window->get_width()), static_cast<GLsizei>(_window->get_height()));
             glClear(static_cast<unsigned int>(GL_COLOR_BUFFER_BIT) | static_cast<unsigned int>(GL_DEPTH_BUFFER_BIT));
 
-            auto camera = scene->get_camera();
+            auto camera = _scene->get_camera();
             if (camera->should_receive_aspect_ratio_from_renderer()) {
-                float aspect_ratio = fabsf(static_cast<float>(window->get_width()) / static_cast<float>(window->get_height()));
+                float aspect_ratio = fabsf(static_cast<float>(_window->get_width()) / static_cast<float>(_window->get_height()));
                 camera->set_aspect_ratio(aspect_ratio);
             }
             if (camera->should_receive_viewport_from_renderer()) {
-                camera->set_viewport(glm::vec4(0, 0, window->get_width(), window->get_height()));
+                camera->set_viewport(glm::vec4(0, 0, _window->get_width(), _window->get_height()));
             }
 
             std::vector<std::shared_ptr<Mesh>> opaque, transparent, overlays;
             std::queue<std::shared_ptr<Object>> queue;
-            queue.push(scene->get_root());
+            queue.push(_scene->get_root());
             while (!queue.empty()) {
                 const auto object = queue.front(); queue.pop();
                 if (auto mesh = std::dynamic_pointer_cast<Mesh>(object)) {
@@ -93,17 +93,20 @@ namespace aur
                 _render_mesh(mesh);
             }
 
-            window->swap();
+            _window->swap();
         }
 
     private:
         void _render_mesh(const std::shared_ptr<Mesh> &mesh) const
         {
-            auto geometry = mesh->get_geometry();
-            auto material = mesh->get_material();
+            if (!mesh->is_enabled()) return;
+
+            auto &geometry = mesh->get_geometry();
+            auto &material = mesh->get_material();
 
             material->use();
-            material->update(scene, mesh);
+            material->update(_scene, mesh);
+            geometry->update(*material);
             geometry->use();
 
             glDrawElements(
