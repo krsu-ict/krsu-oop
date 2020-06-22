@@ -51,7 +51,7 @@
 
 * <https://docs.google.com/spreadsheets/d/1S75_KAFviam7yBu6RwkMGoFb3ajjsu6Wx22nCabftEU>
 
-## Регистрация на финальный
+## Регистрация на финальный экзамен
 
 * <https://docs.google.com/spreadsheets/d/1dNaRYLQwGIapxCsCWRwu-H5G7HBmKGFymq6Cz0Spvdw>
 
