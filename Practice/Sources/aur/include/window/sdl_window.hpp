@@ -19,15 +19,9 @@ namespace aur
     class SDLWindow final : public Window
     {
     public:
-        explicit SDLWindow(
-            const std::string &name,
-            bool msaa_enabled = false,
-            int msaa_samples = 2
-        ) : SDLWindow(name, FULLSCREEN, FULLSCREEN, msaa_enabled, msaa_samples) {}
-
         SDLWindow(
             const std::string &name,
-            unsigned int width, unsigned int height,
+            unsigned int width = FULLSCREEN, unsigned int height = FULLSCREEN,
             bool msaa_enabled = false,
             int msaa_samples = 2
         ) : Window{name, width, height}
@@ -62,7 +56,7 @@ namespace aur
             }
 
             unsigned int flags{SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI};
-            if (width == FULLSCREEN || height <= FULLSCREEN) {
+            if (width == FULLSCREEN || height == FULLSCREEN) {
                 flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
             }
             _window = SDL_CreateWindow(
