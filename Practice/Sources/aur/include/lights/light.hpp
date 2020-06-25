@@ -10,16 +10,6 @@ namespace aur
     class Light : public Object
     {
     public:
-        bool is_enabled() const
-        {
-            return _enabled;
-        }
-
-        void set_enabled(bool enabled)
-        {
-            _enabled = enabled;
-        }
-
         const glm::vec3 &get_ambient_color() const
         {
             return _ambient_color;
@@ -71,8 +61,6 @@ namespace aur
         }
 
     private:
-        bool _enabled{true};
-
         glm::vec3 _ambient_color{0.0f};
         glm::vec3 _diffuse_color{1.0f};
         glm::vec3 _specular_color{1.0f};
